@@ -7,6 +7,10 @@ const app = express()
 const port = 3000
 app.use(express.json())
 
+const MinhaSenha = 'ifrn2@23';
+
+
+
 
 
 var con = mysql.createConnection({
@@ -22,6 +26,67 @@ con.connect((erroConexao) => {
     throw erroConexao;
   }
 });
+
+
+
+app.post('/login', (req, res) => {
+
+  const idUser = req.body.user;
+  const pass = req.body.pass;
+  const sql = 'SELECT * FROM Users WHERE userId  = ? AND pass = ?';
+
+  con.query(sql, [idUser, pass], (erroComandoSQL, result, fields) => {
+    if (erroComandoSQL) {
+      throw erroComandoSQL;
+    } else {
+      if (result.length > 0) {
+        //const nome = result[0].NoOperador;
+        const token = jwt.sign({ idUser, pass }, MinhaSenha, {
+          expiresIn: 60 * 10, // expires in 5min (300 segundos ==> 5 x 60)
+        });
+
+
+        res.json({ auth: true, token: token });
+      } else {
+        res.status(403).json({ message: 'Login inválido!'});
+      }
+    }
+  });
+});
+
+
+
+
+
+function verificarToken(req, res, next) {
+  const token = req.headers['x-access-token'];
+  if (!token) {
+    res.status(401).json({
+      auth: false,
+      message: 'Nenhum token de autenticação informado.',
+    });
+  } else {
+    jwt.verify(token, MinhaSenha, function (err, decoded) {
+      if (err) {
+        res.status(500).json({ auth: false, message: 'Token inválido.' });
+      } else {
+        console.log('Metodo acessado por ' + decoded.nome);
+        next();
+      }
+    });
+  }
+}
+
+
+app.get('/player', verificarToken, (req, res) => {
+  con.query('SELECT * FROM Players', (erroComandoSQL, result, fields) => {
+    if (erroComandoSQL) {
+      throw erroComandoSQL;
+    }
+    res.status(200).send(result);
+  });
+});
+
 
 
 
@@ -45,11 +110,13 @@ app.get('/player/:id', (req, res) => {
 });
 
 
+
+
 // POST - Adicionar um novo jogador
 app.post('/player', (req, res) => {
-    const { nome, data_nascimento, nacionalidade, posição, altura, peso, contrato_atual, salario_atual } = req.body;
-    const sql = 'INSERT INTO Players (nome, data_nascimento, nacionalidade, posição, altura, peso, contrato_atual, salario_atual) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-    con.query(sql, [nome, data_nascimento, nacionalidade, posição, altura, peso, contrato_atual, salario_atual], (erroComandoSQL, result, fields) => {
+    const { nome, data_nascimento, nacionalidade, posicao, altura, peso, contrato_atual, salario_atual } = req.body;
+    const sql = 'INSERT INTO Players (nome, data_nascimento, nacionalidade, posicao, altura, peso, contrato_atual, salario_atual) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    con.query(sql, [nome, data_nascimento, nacionalidade, posicao, altura, peso, contrato_atual, salario_atual], (erroComandoSQL, result, fields) => {
       if (erroComandoSQL) {
         throw erroComandoSQL;
       }
@@ -61,9 +128,9 @@ app.post('/player', (req, res) => {
 // PUT - Atualizar informações de um jogador
 app.put('/player/:id', (req, res) => {
     const idPlayer = req.params.id;
-    const { nome, data_nascimento, nacionalidade, posição, altura, peso, contrato_atual, salario_atual } = req.body;
-    const sql = 'UPDATE Players SET nome = ?, data_nascimento = ?, nacionalidade = ?, posição = ?, altura = ?, peso = ?, contrato_atual = ?, salario_atual = ? WHERE player_id = ?';
-    con.query(sql, [nome, data_nascimento, nacionalidade, posição, altura, peso, contrato_atual, salario_atual, idPlayer], (erroComandoSQL, result, fields) => {
+    const { nome, data_nascimento, nacionalidade, posicao, altura, peso, contrato_atual, salario_atual } = req.body;
+    const sql = 'UPDATE Players SET nome = ?, data_nascimento = ?, nacionalidade = ?, posicao = ?, altura = ?, peso = ?, contrato_atual = ?, salario_atual = ? WHERE player_id = ?';
+    con.query(sql, [nome, data_nascimento, nacionalidade, posicao, altura, peso, contrato_atual, salario_atual, idPlayer], (erroComandoSQL, result, fields) => {
       if (erroComandoSQL) {
         throw erroComandoSQL;
       }
