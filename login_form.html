@@ -48,12 +48,53 @@
 
     <div class="tab-content mt-2">
       <div class="tab-pane fade show active" id="api-gratis">
-        <h3>Conteúdo da API grátis</h3>
-        <p>asdasdas</p>
+        <h3>Conteúdo da API grátis 💸</h3>
+
+        <a class="btn btn-primary" data-toggle="collapse" href="#jogadores" role="button" aria-expanded="false" aria-controls="jogadores">
+          Jogadores🤾‍♂️⚽
+        </a>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#performance" aria-expanded="false" aria-controls="performance">
+          Performance⚽📈
+        </button>
+        <a class="btn btn-primary" data-toggle="collapse" href="#transferencias" role="button" aria-expanded="false" aria-controls="transferencias">
+          Transferencias
+        </a>
+        <a class="btn btn-primary" data-toggle="collapse" href="#lesoes" role="button" aria-expanded="false" aria-controls="lesoes">
+          Lesões
+        </a>
+        
+        <div class="collapse" id="jogadores">
+          <div class="card card-body">
+            <!-- Conteúdo dos jogadores -->
+          </div>
+        </div>
+        
+        <div class="collapse" id="performance">
+          <div class="card card-body">
+            <!-- Conteúdo da performance -->
+          </div>
+        </div>
+        
+        <div class="collapse" id="transferencias">
+          <div class="card card-body">
+            <!-- Conteúdo das transferências -->
+          </div>
+        </div>
+        
+        <div class="collapse" id="lesoes">
+          <div class="card card-body">
+            <!-- Conteúdo das lesões -->
+          </div>
+        </div>
+         
+        </div>
+
+
+        <p></p>
       </div>
       <div class="tab-pane fade" id="api-paga">
-        <h3>Conteúdo da API paga</h3>
-        <p>asdasd</p>
+        <h3>Conteúdo da API paga 💰</h3>
+        <p></p>
 
         <form>
             <div class="form-group">
@@ -73,12 +114,29 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
   <script>
-        document.querySelector('form').addEventListener('submit', (e) => {
+  document.querySelector('form').addEventListener('submit', (e) => {
   e.preventDefault(); // Impede o envio do formulário
 
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
+
+
+  // Função para decodificar Base64 URL Safe
+    function base64urlDecode(data) {
+      const padding = '='.repeat((4 - (data.length % 4)) % 4);
+      const base64 = (data + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const decodedData = atob(base64);
+      return decodedData;
+    }
+
+    //const [header, payload, signature] = token.split('.');
+
+
+
 
   const loginData = {
     user: username,
@@ -95,13 +153,56 @@
     .then(response => response.json())
     .then(data => {
       // Processa a resposta da requisição
-      console.log(data);
+      console.log(data.token);
+
+      const [header, payload, signature] = data.token.split('.');
+      console.log(payload)
+
+
     })
     .catch(error => {
       // Lida com erros de requisição
       console.error(error);
     });
 });
-    </script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const collapseButtons = document.querySelectorAll('[data-toggle="collapse"]');
+  
+  collapseButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('href').replace('#', '');
+      const targetCollapse = document.getElementById(targetId);
+      const url = 'http://localhost:3000/player/'; // Insira a URL da sua API aqui
+      
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('Erro ao carregar os dados da API');
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          var content = JSON.stringify(data); // Converte a resposta para uma string JSON
+          targetCollapse.querySelector('.card-body').textContent = content; // Exibe o conteúdo na div de colapso
+          
+          // Você também pode formatar o conteúdo e estruturá-lo conforme necessário
+          // Exemplo: targetCollapse.querySelector('.card-body').innerHTML = '<p>' + data.title + '</p>';
+          
+          targetCollapse.classList.add('show'); // Mostra o conteúdo do collapse
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    });
+  });
+});
+
+
+
+
+
+</script>
 </body>
 </html>
