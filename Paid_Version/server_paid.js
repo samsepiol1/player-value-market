@@ -1,5 +1,6 @@
 const express = require('express')
 const mysql = require('mysql')
+const cors = require('cors')
 const TokenMiddlware = require('./middleware/validarToken.middleware')
 const rotaLogin = require('./routes/user.rota')
 
@@ -7,6 +8,7 @@ const rotaLogin = require('./routes/user.rota')
 const app = express()
 const port = 3000
 app.use(express.json())
+app.use(cors());
 app.use('/login', rotaLogin)
 
 
