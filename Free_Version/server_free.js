@@ -12,7 +12,6 @@ app.use(cors())
 
 
 
-//const MinhaSenha = 'ifrn2@23';
 
 var con = mysql.createConnection({
   host: 'localhost',
