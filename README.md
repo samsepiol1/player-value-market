@@ -17,5 +17,12 @@ A API de Gerenciamento de Jogadores permite realizar operações relacionadas ao
 - MySQL (8.0.21)
 - Node.js (16.16.0)
 
+### Documentação
+- Jupyter Book (0.15.1)
+
+- Sphnix (5.0.2)
+
+
+
 
 
